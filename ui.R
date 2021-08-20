@@ -8,7 +8,8 @@ dashboardPage(
         sidebarMenu(
             menuItem("Ceros", tabName = "Ceros"),
             menuItem("Derivacion f(X)", tabName = "DerivacionX"),
-            menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY")
+            menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY"),
+            menuItem("Bisecci\u00F3n f(X)", tabName = "bisection")
         )
     ),
     dashboardBody(
@@ -44,7 +45,17 @@ dashboardPage(
                         textInput("valorYXY", "y"),
                         textInput("valorHXY", "h")),
                     actionButton("diferFinEvalXY", "Evaluar Derivada"),
-                    tableOutput("difFinitOutXY"))
+                    tableOutput("difFinitOutXY")),
+            
+            tabItem("bisection", 
+                h1("M\u00E9todo de bisecci\u00F3n f(x)"),
+                box(textInput("tinputBisectionFunc", "Ingrese la ecuaci\u00F3n"),
+                    textInput("tinputBisectionAB",   "Intervalo [a,b]", "0,0"),
+                    textInput("tinputBisectionKmax", "M\u00E1ximo iteraciones (kmax)"),
+                    textInput("tinputBisectionTol",  "Tolerancia"),
+                    actionButton("btnBisection",     "Ejecutar m\u00E9todo")
+                    , textOutput("selected")),
+                tableOutput("tblBisection"))
         )
     )
 )

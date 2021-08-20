@@ -1,18 +1,27 @@
-import pandas
+import pandas as pd
 import numpy as np
 import re
-from sympy import diff
+from sympy import diff, solveset, Eq, Interval, S
 from sympy.abc import x,y
+from math import *
 
+
+
+def transform_function(str_equ):
+  strOut = str_equ\
+          .replace("x", '*(x)')\
+          .replace("^", "**")
+  return strOut
+
+  
 #Evaluación REGREX
 def evaluate_Fx(str_equ, valX):
   x = valX
-  strOut = str_equ.replace("x", '*(x)')
-  strOut = strOut.replace("^", "**")
+  strOut = transform_function(str_equ)
   out = eval(strOut)
-  print(strOut)
-
+  # print("evaluate_Fx:::", strOut)
   return out
+
 
 def derivar(str_equ, x):
   #dfx/dx
@@ -20,6 +29,7 @@ def derivar(str_equ, x):
   strFx = strFx.replace("^", "**")
   dx = diff(strFx,y).subs(y,x) 
   return dx
+
 
 #Deferencias finitas para derivadas
 def evaluate_derivate_fx1(str_equ, x, h):
@@ -208,6 +218,7 @@ def evaluate_derivate_fx1XY(str_equ, x, y, h):
   
   return pandas.DataFrame(datos)
 
+
 def evaluate_derivate_fx2XY(str_equ, x, y, h):
   x = float(x)
   y = float(y)
@@ -341,3 +352,46 @@ def evaluate_derivate_fx3XY(str_equ, x, y, h):
           'Norma': [float(np.sqrt(outX**2+outY**2))]}
   
   return pandas.DataFrame(datos)
+
+
+"""
+Ejecuta y evalua el metodo de biseccion.
+PARAMETROS:
+  f_x, 
+  a, 
+  b, 
+  kmax, 
+  tolerance
+Retorna un pandas.dataframe con los valores de las iteraciones.
+"""
+def evaluate_bisection(f_x, a, b, kmax, tolerance):
+  a = float(a)
+  b = float(b)
+  kmax = float(kmax)
+  tolerance = float(tolerance)
+  dict_result= {'Iteracion':[],
+                'Xk':[],
+                'Error':[]}
+  k = 0
+  xk = (a+b)/2
+  f_xk = evaluate_Fx(f_x, xk)
+  transformed_fx = transform_function(f_x) 
+  equation = Eq(*S(transformed_fx+", 0"))
+  rootss = solveset(equation, x, Interval(a,b))
+  real_x = eval(str( tuple(rootss)[0] ))
+  while k < kmax and abs(f_xk) > tolerance:
+    f_a = evaluate_Fx(f_x, a)
+    # print("k:",k, "  a:",a, "\tb",b, "\txk:",xk, "\tf_xk:",f_xk, "\tf_a:",f_a)
+    if (f_a*f_xk < 0):
+      b = xk
+    else:
+      a = xk
+    k += 1
+    dict_result["Iteracion"].append(int(k))
+    dict_result["Xk"].append(float(xk))
+    dict_result["Error"].append(float(real_x-xk))
+    xk = (a+b)/2
+    f_xk = evaluate_Fx(f_x, xk)
+
+  return pd.DataFrame.from_dict(dict_result)  
+

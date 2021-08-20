@@ -69,5 +69,22 @@ shinyServer(function(input, output) {
         diferFinitCalculateXY()
     })
     
+    # Laboratory 2nd, Bisection method
+    bisectionMethod<-eventReactive(input$btnBisection, {
+        functionn <- input$tinputBisectionFunc
+        a <-    strsplit(input$tinputBisectionAB, split = ",")[[1]][1]
+        b <-    strsplit(input$tinputBisectionAB, split = ",")[[1]][2]
+        kmax <- input$tinputBisectionKmax
+        tolerance <- input$tinputBisectionTol
+        tableout <- evaluate_bisection(functionn, a, b, kmax, tolerance)
+    })
     
+    output$tblBisection<-renderTable(
+        bisectionMethod(), 
+        digits=6
+    )
+    
+    output$selected <- renderText({
+        paste("ab:::", input$tinputBiseccionKmax )
+    })    
 })
