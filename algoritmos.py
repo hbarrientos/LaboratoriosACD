@@ -367,11 +367,15 @@ Retorna un pandas.dataframe con los valores de las iteraciones.
 def evaluate_bisection(f_x, a, b, kmax, tolerance):
   a = float(a)
   b = float(b)
-  kmax = float(kmax)
-  tolerance = float(tolerance)
+  f_a = float(evaluate_Fx(f_x, a))
+  f_b = float(evaluate_Fx(f_x, b))
   dict_result= {'Iteracion':[],
                 'Xk':[],
                 'Error':[]}
+  if ((f_a*f_b) > 0):
+    return pd.DataFrame.from_dict(dict_result)
+  kmax = float(kmax)
+  tolerance = float(tolerance)
   k = 0
   xk = (a+b)/2
   f_xk = evaluate_Fx(f_x, xk)
@@ -389,9 +393,9 @@ def evaluate_bisection(f_x, a, b, kmax, tolerance):
     k += 1
     dict_result["Iteracion"].append(int(k))
     dict_result["Xk"].append(float(xk))
-    dict_result["Error"].append(float(real_x-xk))
+    dict_result["Error"].append(float(abs(real_x-xk)))
     xk = (a+b)/2
     f_xk = evaluate_Fx(f_x, xk)
 
-  return pd.DataFrame.from_dict(dict_result)  
+  return pd.DataFrame.from_dict(dict_result)
 

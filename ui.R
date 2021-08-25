@@ -53,8 +53,10 @@ dashboardPage(
                     textInput("tinputBisectionAB",   "Intervalo [a,b]", "0,0"),
                     textInput("tinputBisectionKmax", "M\u00E1ximo iteraciones (kmax)"),
                     textInput("tinputBisectionTol",  "Tolerancia"),
-                    actionButton("btnBisection",     "Ejecutar m\u00E9todo")
-                    , textOutput("selected")),
+                    actionButton("btnBisection",     "Ejecutar m\u00E9todo", icon = icon("table")),
+                    helpText("Nota: Si la tabla viene vacia, pruebe modificar los puntos a,b.\n ", 
+                             "Puede ser que: 1. se encontro la raiz en la primera iteracion; ", 
+                             "2. no hay raiz en el intervalo.")),
                 tableOutput("tblBisection"))
         )
     )

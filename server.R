@@ -84,7 +84,4 @@ shinyServer(function(input, output) {
         digits=6
     )
     
-    output$selected <- renderText({
-        paste("ab:::", input$tinputBiseccionKmax )
-    })    
 })
