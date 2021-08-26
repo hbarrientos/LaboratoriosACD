@@ -6,11 +6,52 @@ from sympy.abc import x,y
 from math import *
 
 
+p = re.compile('[\+|\-|*|/]')
+math_operator = ["+", "-", "*", "/"]
+
+def process_exp(func_str):
+  e_index = func_str.find("e^")
+  if (e_index >= 0):
+    padd = 2
+    if ( not(func_str[e_index + padd] == "(") ):
+      k = p.search(func_str[e_index+padd:])
+      if (k):
+        i = e_index + padd + k.start()
+        func_str = func_str[:i] + ")" + func_str[i:]
+        func_str = func_str[:e_index] + "exp(" + func_str[e_index+padd:]
+      else: #ya no encontro signo
+        func_str = func_str[:e_index] + "exp(" + func_str[e_index+padd:] + ")"
+    else:
+      func_str = func_str[:e_index] + "exp" + func_str[e_index+padd:]
+  if (func_str.find("e^") >= 0):
+    func_str = process_exp(func_str)
+  return func_str
+
+
+def add_one_before_x(func_str):
+  result_func = ""
+  for i in range(len(func_str)):
+    one = "1" if (func_str[i] == "x" and (i==0 or func_str[i-1] in math_operator) ) else ""
+    result_func += one + func_str[i]
+  return result_func
+
+
+def replace_x(func_str):
+  result_func = ""
+  for i in range(len(func_str)):
+    result_func += "*(x)" if (func_str[i] == "x" and func_str[i-1].isnumeric()) else func_str[i]
+  return result_func
+
 
 def transform_function(str_equ):
+  str_equ = process_exp(str_equ)
+  str_equ = add_one_before_x(str_equ)
+  str_equ = replace_x(str_equ)
+
+  # .replace("x", '*(x)')\
   strOut = str_equ\
-          .replace("x", '*(x)')\
           .replace("^", "**")
+  # print("transform_function:", strOut)
   return strOut
 
   
