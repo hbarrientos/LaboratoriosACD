@@ -1,4 +1,3 @@
-
 library(shiny)
 library(reticulate)
 
@@ -81,6 +80,22 @@ shinyServer(function(input, output) {
     
     output$tblBisection<-renderTable(
         bisectionMethod(), 
+        digits=6
+    )
+    
+    # Laboratory 2nd, NR method
+    NRMethod<-eventReactive(input$btnNR,{ 
+        functionn <- input$tinputNRFunc
+        x <- input$tinputNRX
+        kmax <- input$tinputNRKmax
+        tolerance <- input$tinputNRTol
+        tableout <- evaluate_NR(functionn, x, kmax, tolerance)
+        
+        tableout
+    })
+    
+    output$tblNR<-renderTable(
+        NRMethod(),
         digits=6
     )
     

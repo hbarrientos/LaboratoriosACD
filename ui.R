@@ -9,7 +9,9 @@ dashboardPage(
             menuItem("Ceros", tabName = "Ceros"),
             menuItem("Derivacion f(X)", tabName = "DerivacionX"),
             menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY"),
-            menuItem("Bisecci\u00F3n f(X)", tabName = "bisection")
+            menuItem("Bisecci\u00F3n f(X)", tabName = "bisection"),
+            menuItem("Newton Raphson f(X)", tabName = "newtonraphson")
+            
         )
     ),
     dashboardBody(
@@ -57,7 +59,20 @@ dashboardPage(
                     helpText("Nota: Si la tabla se retorna vacia, pruebe modificar los puntos a,b.\n ", 
                              "Puede ser que: 1. se encontro la raiz en la primera iteracion; ", 
                              "2. no hay raiz en el intervalo.")),
-                tableOutput("tblBisection"))
+                tableOutput("tblBisection")),
+            
+            tabItem("newtonraphson", 
+                    h1("M\u00E9todo de Newton-Raphson f(x)"),
+                    box(textInput("tinputNRFunc", "Ingrese la ecuaci\u00F3n"),
+                        textInput("tinputNRX",   "Valor de X"),
+                        textInput("tinputNRKmax", "M\u00E1ximo iteraciones (kmax)"),
+                        textInput("tinputNRTol",  "Tolerancia"),
+                        actionButton("btnNR",     "Ejecutar m\u00E9todo", icon = icon("table")),
+                        helpText("Nota: Únicamente se aceptan expresiones de e elevado a x ej. e^x, dado que si la x viene\n",
+                        "por un factor o elevada a otra potencia tendría que aplicar la regla de la cadena para derivar",
+                        "\n lo cual está fuera del alcance de este código.\n\n",
+                        "Si la variable x no tiene ninguna potencia explícita hay que indicarla x = x^1")),
+                    tableOutput("tblNR"))
         )
     )
 )

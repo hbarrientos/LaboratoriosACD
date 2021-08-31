@@ -25,6 +25,7 @@ def process_exp(func_str):
       func_str = func_str[:e_index] + "exp" + func_str[e_index+padd:]
   if (func_str.find("e^") >= 0):
     func_str = process_exp(func_str)
+    
   return func_str
 
 
@@ -60,10 +61,33 @@ def evaluate_Fx(str_equ, valX):
   x = valX
   strOut = transform_function(str_equ)
   out = eval(strOut)
-  # print("evaluate_Fx:::", strOut)
+  #print("evaluate_Fx:::", strOut)
   return out
 
+#Evaluación REGREX
+def evaluate_derivate_Fx(str_equ, valX):
+  x = valX
+  strOut = transform_function(str_equ)
+  strOut = derive_function(strOut)
+  out = eval(strOut)
+  #print("evaluate_derive_Fx:::", strOut)
+  return out
 
+def derive_function(str_equ):
+  pattern1 = re.compile('\(x\)\*\*\d')
+  pattern2 = re.compile('x\*\*\d')
+  vars = pattern1.findall(str_equ) + pattern2.findall(str_equ)
+  
+  dictMap = {}
+  for var in vars:
+    out = var[-1] + '*' + var[0:-1] + '('+var[-1]+'-1)' 
+    dictMap[var] = out
+    
+  for key, value in dictMap.items():
+    str_equ = str_equ.replace(key, value)
+  
+  return str_equ
+  
 def derivar(str_equ, x):
   #dfx/dx
   strFx = str_equ.replace("x", '*(y)')
@@ -96,7 +120,7 @@ def evaluate_derivate_fx1(str_equ, x, h):
           'Aproximación':[out],
           'Error': [float(abs(dx-out))]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 def evaluate_derivate_fx2(str_equ, x, h):
   x = float(x)
@@ -124,7 +148,7 @@ def evaluate_derivate_fx2(str_equ, x, h):
           'Aproximación':[out],
           'Error': [float(abs(dx-out))]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 def evaluate_derivate_fx3(str_equ, x, h):
   x = float(x)
@@ -155,7 +179,7 @@ def evaluate_derivate_fx3(str_equ, x, h):
           'Aproximación':[out],
           'Error': [float(abs(dx-out))]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 
 #Deferencias finitas para derivadas
@@ -204,7 +228,7 @@ def newtonSolverX(x0, f_x, eps):
     solution = [i, xn, error]
 
   print("Finalizo...")
-  TableOut = pandas.DataFrame({'Iter':arrayIters, 'Xn':arrayXn, 'Error': arrayErr})
+  TableOut = pd.DataFrame({'Iter':arrayIters, 'Xn':arrayXn, 'Error': arrayErr})
   return TableOut
 
 def add(a, b):
@@ -257,7 +281,7 @@ def evaluate_derivate_fx1XY(str_equ, x, y, h):
   datos = {'Aprox df/dx':[outX],
           'Aprox df/dy':[outY]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 
 def evaluate_derivate_fx2XY(str_equ, x, y, h):
@@ -318,7 +342,7 @@ def evaluate_derivate_fx2XY(str_equ, x, y, h):
           'Aprox df/dy':[outY],
           'Norma': [float(np.sqrt(outX**2+outY**2))]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 
 def evaluate_derivate_fx3XY(str_equ, x, y, h):
@@ -392,7 +416,7 @@ def evaluate_derivate_fx3XY(str_equ, x, y, h):
           'Aprox df/dy':[outY],
           'Norma': [float(np.sqrt(outX**2+outY**2))]}
   
-  return pandas.DataFrame(datos)
+  return pd.DataFrame(datos)
 
 
 """
@@ -440,3 +464,34 @@ def evaluate_bisection(f_x, a, b, kmax, tolerance):
 
   return pd.DataFrame.from_dict(dict_result)
 
+"""
+Ejecuta y evalua el metodo de Newton Raphson.
+PARAMETROS:
+  f_x, 
+  x, 
+  kmax, 
+  tolerance
+Retorna un pandas.dataframe con los valores de las iteraciones.
+"""
+def evaluate_NR(f_x, x, kmax, tolerance):
+  x = float(x)
+  kmax = float(kmax)
+  tolerance = float(tolerance)
+  F_x = float(evaluate_Fx(f_x, x))
+  k = 0
+  
+  dict_result= {'Iteracion':[],
+                'Xk':[],
+                'Error':[]}
+  
+  while k < kmax and abs(F_x) > tolerance:
+    x -= evaluate_Fx(f_x, x)/evaluate_derivate_Fx(f_x, x)
+    k += 1
+    
+    dict_result["Iteracion"].append(int(k))
+    dict_result["Xk"].append(float(x))
+    dict_result["Error"].append(float(abs(F_x)))
+    
+    F_x = float(evaluate_Fx(f_x, x))
+  
+  return pd.DataFrame.from_dict(dict_result)
