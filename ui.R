@@ -1,5 +1,6 @@
 library(shiny)
 library(shinydashboard)
+library(shinyjs)
 
 # Define UI for application that draws a histogram
 dashboardPage(
@@ -10,8 +11,9 @@ dashboardPage(
             menuItem("Derivacion f(X)", tabName = "DerivacionX"),
             menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY"),
             menuItem("Bisecci\u00F3n f(X)", tabName = "bisection"),
-            menuItem("Newton Raphson f(X)", tabName = "newtonraphson")
-            
+            menuItem("Newton Raphson f(X)", tabName = "newtonraphson"),
+            menuItem("Gradient descent f(X)", tabName = "gradient_descent"),
+            menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function")
         )
     ),
     dashboardBody(
@@ -72,7 +74,30 @@ dashboardPage(
                         "por un factor o elevada a otra potencia tendría que aplicar la regla de la cadena para derivar",
                         "\n lo cual está fuera del alcance de este código.\n\n",
                         "Si la variable x no tiene ninguna potencia explícita hay que indicarla x = x^1")),
-                    tableOutput("tblNR"))
+                    tableOutput("tblNR")),
+            
+            tabItem("gradient_descent", 
+                    h1("Gradient descent f(x)"),
+                    box(textInput("tinput_gdq",  "Q", "2,-1,0;-1,2,-1;0,-1,2"),
+                        textInput("tinput_gdc",  "c", "1;0;1"),
+                        textInput("tinput_gdepsilon", "epsilon", "0.000001"),
+                        numericInput("tinput_gdn",  "N:", 30),
+                        textInput("tinput_gdxo", "Xo:", "3;5;7"),
+                        actionButton("btn_gd",   "Ejecutar m\u00E9todo", icon = icon("table")),
+                        helpText("Nota: En los controles de 'Q', 'c' y 'Xo', se esperan matrices y ",
+                                 "se ingresan separando columnas con coma y filas con punto y coma.")),
+                    tableOutput("tbl_gd")),
+            
+            tabItem("rosenbrock_function", 
+                    h1("Funci\u00F3n de Rosenbrock f(x)"),
+                    box(useShinyjs(),  # Set up shinyjs
+                        disabled(textInput("tinput_rbck_func", "Funci\u00F3n de Rosenbrock", "100(x_2 - x_1^2)^2 + (1 - x_1)^2")),
+                        textInput("tinput_rbckxo", "Xo:", "0,0"),
+                        textInput("tinput_rbck_alpha",  "a:", "0.05"),
+                        actionButton("btn_rbck",   "Ejecutar m\u00E9todo", icon = icon("table")),
+                        helpText("Nota: ")),
+                    tableOutput("tbl_rosenbrock")
+                    )
         )
     )
 )

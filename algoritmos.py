@@ -495,3 +495,31 @@ def evaluate_NR(f_x, x, kmax, tolerance):
     F_x = float(evaluate_Fx(f_x, x))
   
   return pd.DataFrame.from_dict(dict_result)
+
+
+"""
+"""
+def evaluate_gd(q, c, e, n, xo):
+  q = np.matrix(q, dtype=float)
+  c = np.matrix(c, dtype=float)
+  e = float(e)
+  n = int(n)
+  xo = np.matrix(xo, dtype=float)
+  dict_result= {'k':[],
+                'Xk':[],
+                'Pk':[],
+                'GDf(Xk)':[]}
+  return pd.DataFrame.from_dict(dict_result)
+
+
+
+def evaluate_rosenbrock(xo, a):
+  xo = np.matrix(xo, dtype=float)
+  a = float(a)
+  dict_result= {'k':[],
+                'Xk':[],
+                'Pk':[],
+                'GDf(Xk)':[]}
+  return pd.DataFrame.from_dict(dict_result)
+
+
