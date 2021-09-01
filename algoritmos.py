@@ -444,10 +444,10 @@ def evaluate_bisection(f_x, a, b, kmax, tolerance):
   k = 0
   xk = (a+b)/2
   f_xk = evaluate_Fx(f_x, xk)
-  transformed_fx = transform_function(f_x) 
-  equation = Eq(*S(transformed_fx+", 0"))
-  rootss = solveset(equation, x, Interval(a,b))
-  real_x = eval(str( tuple(rootss)[0] ))
+  # transformed_fx = transform_function(f_x) 
+  # equation = Eq(*S(transformed_fx+", 0"))
+  # rootss = solveset(equation, x, Interval(a,b))
+  # real_x = eval(str( tuple(rootss)[0] ))
   while k < kmax and abs(f_xk) > tolerance:
     f_a = evaluate_Fx(f_x, a)
     # print("k:",k, "  a:",a, "\tb",b, "\txk:",xk, "\tf_xk:",f_xk, "\tf_a:",f_a)
@@ -458,7 +458,7 @@ def evaluate_bisection(f_x, a, b, kmax, tolerance):
     k += 1
     dict_result["Iteracion"].append(int(k))
     dict_result["Xk"].append(float(xk))
-    dict_result["Error"].append(float(abs(real_x-xk)))
+    dict_result["Error"].append(float(abs(f_xk)))
     xk = (a+b)/2
     f_xk = evaluate_Fx(f_x, xk)
 

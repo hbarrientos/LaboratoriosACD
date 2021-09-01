@@ -80,7 +80,8 @@ shinyServer(function(input, output) {
     
     output$tblBisection<-renderTable(
         bisectionMethod(), 
-        digits=6
+        digits=6,
+        striped = TRUE, bordered = TRUE, hover = TRUE
     )
     
     # Laboratory 2nd, NR method
