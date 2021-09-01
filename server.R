@@ -100,23 +100,6 @@ shinyServer(function(input, output) {
         digits=6
     )
     
-    # 3rd laboratory, Gradient descent method
-    # output$tbl_gd <- renderTable(eventReactive(input$btn_gd, {
-    gd_method <- eventReactive(input$btn_gd, {
-        q <- input$tinput_gdq
-        c <- input$tinput_gdc
-        e <- input$tinput_gdepsilon
-        n <- input$tinput_gdn
-        xo <- input$tinput_gdxo
-        tableout <- evaluate_gd(q, c, e, n, xo)
-    })
-    # ,
-    output$tbl_gd <- renderTable(
-        gd_method(),
-        digits=6,
-        striped = TRUE, bordered = TRUE, hover = TRUE
-    )
-    
     # 3rd laboratory, Rosenbrock's frunction
     # output$tbl_rosenbrock <- renderTable(eventReactive(input$btn_rbck, {
     rosenbrock_method <- eventReactive(input$btn_rbck, {
