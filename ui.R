@@ -80,9 +80,12 @@ dashboardPage(
                     box(useShinyjs(),  # Set up shinyjs
                         disabled(textInput("tinput_rbck_func", "Funci\u00F3n de Rosenbrock", "100(x_2 - x_1^2)^2 + (1 - x_1)^2")),
                         textInput("tinput_rbckxo", "Xo:", "0,0"),
-                        textInput("tinput_rbck_alpha",  "a:", "0.05"),
+                        textInput("tinput_rbck_alpha", "\u03B1k:", "0.05"),
+                        textInput("tinput_rbck_epsilon", "\u03B5:", "0.00000001"),
+                        numericInput("tinput_rbck_kmax", "kmax:", "1000"),
                         actionButton("btn_rbck",   "Ejecutar m\u00E9todo", icon = icon("table")),
-                        helpText("Nota: ")),
+                        helpText("Tip:"),
+                        width = 4),
                     tableOutput("tbl_rosenbrock")
                     )
         )

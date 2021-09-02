@@ -104,8 +104,10 @@ shinyServer(function(input, output) {
     # output$tbl_rosenbrock <- renderTable(eventReactive(input$btn_rbck, {
     rosenbrock_method <- eventReactive(input$btn_rbck, {
         xo <- input$tinput_rbckxo
-        a <- input$tinput_rbck_alpha
-        tableout <- evaluate_rosenbrock(xo, a)
+        alpha <- input$tinput_rbck_alpha
+        epsilon <- input$tinput_rbck_epsilon
+        kmax <- input$tinput_rbck_kmax
+        tableout <- evaluate_rosenbrock(xo, alpha, epsilon, kmax)
     })
     # ,
     output$tbl_rosenbrock <- renderTable(

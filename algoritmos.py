@@ -499,13 +499,44 @@ def evaluate_NR(f_x, x, kmax, tolerance):
 
 """
 """
-def evaluate_rosenbrock(xo, a):
-  xo = np.matrix(xo, dtype=float)
-  a = float(a)
+def evaluate_rosenbrock(xo, alpha, epsilon, kmax):
   dict_result= {'k':[],
                 'Xk':[],
                 'Pk':[],
-                'GDf(Xk)':[]}
+                '||GDf(Xk)||':[]}
+  k = 0
+  alpha = float(alpha)
+  # kmax = 1000
+  epsilon = float(epsilon)
+  Q = np.array([[8,4],[4,4]])
+  df_dx = "8*x+4*w-3"  #x1
+  df_dw = "4*w+4*x"    #x2
+  xo = np.matrix(xo, dtype=float)
+  xk = np.transpose(xo)
+  x = xk[0, 0]
+  w = xk[1, 0]
+  gd_f = np.array([[eval(df_dx)], [eval(df_dw)]])
+  gd_f_norm = np.linalg.norm(np.power(gd_f, 2), 1)
+  # print("k=", k, "; abs(gd_f_norm)=", abs(gd_f_norm))
+
+  while abs(gd_f_norm) > epsilon and k < kmax:
+    # para calcular alpha a usar
+    # gd_f_norm = np.linalg.norm(np.power(gd_f, 2), 1)
+    # gd_f_T_by_q = np.transpose(gd_f)*Q
+    
+    dict_result['k'].append(str(k))
+    dict_result['Xk'].append("[{:.8f}, {:.8f}]".format(x, w))
+    dict_result['Pk'].append("[{:.8f}, {:.8f}]".format(gd_f[0,0], gd_f[1,0]))
+    dict_result['||GDf(Xk)||'].append(float(gd_f_norm))
+    
+    xk_plus1 = xk - alpha * gd_f
+    xk = xk_plus1
+    x = xk[0, 0]
+    w = xk[1, 0]
+    gd_f = np.array([[eval(df_dx)], [eval(df_dw)]])
+    gd_f_norm = np.linalg.norm(np.power(gd_f, 2), 1)
+    k += 1
+
   return pd.DataFrame.from_dict(dict_result)
 
 
