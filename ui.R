@@ -12,6 +12,7 @@ dashboardPage(
             menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY"),
             menuItem("Bisecci\u00F3n f(X)", tabName = "bisection"),
             menuItem("Newton Raphson f(X)", tabName = "newtonraphson"),
+            menuItem("Gradient Descent (QP)", tabName = "gradient"),
             menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function")
         )
     ),
@@ -84,6 +85,26 @@ dashboardPage(
                         actionButton("btn_rbck",   "Ejecutar m\u00E9todo", icon = icon("table")),
                         helpText("Nota: ")),
                     tableOutput("tbl_rosenbrock")
+            ),
+            
+            tabItem("gradient", 
+                    h1("Algoritmo Gradient Descent (QP)"),
+                    box(textInput("tinput_Q", "Q"),
+                        textInput("tinput_x",  "x"),
+                        textInput("tinput_c",  "c"),
+                        textInput("tinput_error",  "error"),
+                        textInput("tinput_kmax",  "Iteraciones"),
+                        radioButtons("tinput_alpha", label = h3("Step size"),
+                                     choices = list("Exacto" = 0,
+                                                    "Variable" = 2,
+                                                    "Constante (0.001)" = 10,
+                                                    "Constante (0.01)" = 20,
+                                                    "Constante (0.1)" = 30,
+                                                    "Constante (0.5)" = 40,
+                                                    "Constante (1)" = 1)),
+                        actionButton("btn_gd",   "Ejecutar m\u00E9todo", icon = icon("table")),
+                        helpText("Nota: ")),
+                    tableOutput("tbl_gd")
                     )
         )
     )
