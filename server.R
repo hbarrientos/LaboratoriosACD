@@ -2,6 +2,7 @@ library(shiny)
 library(reticulate)
 
 source_python("algoritmos.py")
+source_python("gd.py")
 
 #tableOut, soluc = newtonSolverX(-5, "2x^5 - 3", 0.0001)
 
@@ -98,6 +99,22 @@ shinyServer(function(input, output) {
     output$tblNR<-renderTable(
         NRMethod(),
         digits=6
+    )
+    
+    gradient_method <- eventReactive(input$btn_gd, {
+        Q <- input$tinput_Q
+        x <- input$tinput_x
+        c <- input$tinput_c
+        error <- input$tinput_error
+        kmax <- input$tinput_kmax
+        step <- input$tinput_alpha
+        gd <- GD('[[2, -1, 0],[-1 , 2, -1],[0, -1, 2]]', '[-3, 5, 7]', '[1, 0, 1]', '10**(-6)', '30', '0')
+        gd$algorithm()
+        gd$iterations()
+    })
+
+    output$tbl_gd <- renderTable(
+        gradient_method()
     )
     
     # 3rd laboratory, Rosenbrock's frunction
