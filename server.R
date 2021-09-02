@@ -118,7 +118,6 @@ shinyServer(function(input, output) {
     )
     
     # 3rd laboratory, Rosenbrock's frunction
-    # output$tbl_rosenbrock <- renderTable(eventReactive(input$btn_rbck, {
     rosenbrock_method <- eventReactive(input$btn_rbck, {
         xo <- input$tinput_rbckxo
         alpha <- input$tinput_rbck_alpha
@@ -126,11 +125,10 @@ shinyServer(function(input, output) {
         kmax <- input$tinput_rbck_kmax
         tableout <- evaluate_rosenbrock(xo, alpha, epsilon, kmax)
     })
-    # ,
+
     output$tbl_rosenbrock <- renderTable(
         rosenbrock_method(),
         digits = 8, striped = TRUE, bordered = TRUE, hover = TRUE
     )
-    
-    
+
 })
