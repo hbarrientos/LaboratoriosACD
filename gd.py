@@ -60,10 +60,10 @@ class GD:
             
                 pk,_ = self.p()
             
-                resultados['k'].append(str(k-1))
+                resultados['k'].append(k-1)
                 resultados['xk'].append(str(self.x))
                 resultados['pk'].append(str(pk))
-                resultados['grad_fxk'].append(float(e))
+                resultados['grad_fxk'].append(e)
             
                 if self.step == 0:
                     self.x = self.x + self.alpha() * pk
@@ -84,4 +84,4 @@ class GD:
         plt.xlabel("k (iterations)")
         plt.ylabel("||f'(xk)||")
         plt.title("Gradiente Descent")
-        plt.show()
+        plt.savefig("plot.png")

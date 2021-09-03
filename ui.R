@@ -90,25 +90,32 @@ dashboardPage(
                     tableOutput("tbl_rosenbrock")
             ),
             
-            tabItem("gradient", 
-                    h1("Algoritmo Gradient Descent (QP)"),
-                    box(textInput("tinput_Q", "Q"),
-                        textInput("tinput_x",  "x"),
-                        textInput("tinput_c",  "c"),
-                        textInput("tinput_error",  "error"),
-                        textInput("tinput_kmax",  "Iteraciones"),
-                        radioButtons("tinput_alpha", label = h3("Step size"),
-                                     choices = list("Exacto" = 0,
+            tabItem("gradient", h1("Algoritmo Gradient Descent (QP)"),
+                    fluidRow(
+                        box(width = "100%",
+                    tabsetPanel(id="paneles",
+                        tabPanel("parámetros",
+                            textInput("tinput_Q", "Q", "[[2, -1, 0],[-1 , 2, -1],[0, -1, 2]]"),
+                            textInput("tinput_x",  "x", "[-3, 5, 7]"),
+                            textInput("tinput_c",  "c", "[1, 0, 1]"),
+                            textInput("tinput_error",  "error", "10**(-6)"),
+                            textInput("tinput_kmax",  "Iteraciones", "30"),
+                            selectInput("tinput_alpha", label = "Step size",
+                                      choices = list("Exacto" = 0,
                                                     "Variable" = 2,
-                                                    "Constante (0.001)" = 10,
-                                                    "Constante (0.01)" = 20,
-                                                    "Constante (0.1)" = 30,
-                                                    "Constante (0.5)" = 40,
-                                                    "Constante (1)" = 1)),
+                                                    "0.001" = 0.001,
+                                                    "0.01" = 0.01,
+                                                    "0.1" = 0.1,
+                                                    "0.5" = 0.5,
+                                                    "1" = 1)),
                         actionButton("btn_gd",   "Ejecutar m\u00E9todo", icon = icon("table")),
-                        helpText("Nota: ")),
-                    tableOutput("tbl_gd")
-                    )
+                        helpText("Nota: la Matriz Q, los vectores x y c, así como el error deben estar escritos en sintaxis de python")
+                        ),
+                    tabPanel(title="resultados",
+                           dataTableOutput("tbl_gd")
+                    ),tabPanel(title="plot",
+                               plotOutput("plot_gd")
+                    ))))
         )
     )
-)
+))

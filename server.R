@@ -1,12 +1,14 @@
 library(shiny)
 library(reticulate)
+library(ggplot2)
+library(dplyr)
 
 source_python("algoritmos.py")
 source_python("gd.py")
 
 #tableOut, soluc = newtonSolverX(-5, "2x^5 - 3", 0.0001)
 
-shinyServer(function(input, output) {
+shinyServer(function(input, output, session) {
     
     #Evento y evaluación de metodo de newton para ceros
     newtonCalculate<-eventReactive(input$nwtSolver, {
@@ -108,14 +110,44 @@ shinyServer(function(input, output) {
         error <- input$tinput_error
         kmax <- input$tinput_kmax
         step <- input$tinput_alpha
-        gd <- GD('[[2, -1, 0],[-1 , 2, -1],[0, -1, 2]]', '[-3, 5, 7]', '[1, 0, 1]', '10**(-6)', '30', '0')
+        gd <- GD(Q, x, c, error, kmax, step)
         gd$algorithm()
         gd$iterations()
     })
-
-    output$tbl_gd <- renderTable(
-        gradient_method()
+    
+    gradient_method_plot <- eventReactive(input$btn_gd, {
+        Q <- input$tinput_Q
+        x <- input$tinput_x
+        c <- input$tinput_c
+        error <- input$tinput_error
+        kmax <- input$tinput_kmax
+        step <- input$tinput_alpha
+        gd <- GD(Q, x, c, error, kmax, step)
+        gd$algorithm()
+        gd$results %>%
+            ggplot(aes(x=k, y=grad_fxk)) +
+            geom_line(color="grey") +
+            geom_point(shape=21, color="black", fill="#69b3a2", size=3) +
+            theme_bw()+
+            ggtitle("Gradient Descent´")
+        
+    })
+    
+    observeEvent(input$btn_gd,{
+        updateTabsetPanel(session, "paneles",
+                          selected = "resultados"                    )
+    })
+    
+    output$tbl_gd <- renderDataTable(
+        gradient_method(),
+        options = list(pageLength=10, autoWidth= TRUE, searching=FALSE)
     )
+    
+    output$plot_gd <- renderPlot({
+        gradient_method_plot()
+    }) 
+
+
     
     # 3rd laboratory, Rosenbrock's frunction
     rosenbrock_method <- eventReactive(input$btn_rbck, {
