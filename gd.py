@@ -19,8 +19,8 @@ class GD:
         
     def p(self):
         """Cálculo de p"""
-        g = -np.matmul(self.Q,self.x) + self.c
-        return g,np.array([g])
+        g = np.matmul(self.Q,self.x) + self.c
+        return -g,np.array([g])
 
     def L1(self):
         """Cálculo de Norma L1"""

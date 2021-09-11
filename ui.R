@@ -96,7 +96,7 @@ dashboardPage(
                     tabsetPanel(id="paneles",
                         tabPanel("parámetros",
                             textInput("tinput_Q", "Q", "[[2, -1, 0],[-1 , 2, -1],[0, -1, 2]]"),
-                            textInput("tinput_x",  "x", "[-3, 5, 7]"),
+                            textInput("tinput_x",  "x", "[3, 5, 7]"),
                             textInput("tinput_c",  "c", "[1, 0, 1]"),
                             textInput("tinput_error",  "error", "10**(-6)"),
                             textInput("tinput_kmax",  "Iteraciones", "30"),
