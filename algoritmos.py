@@ -511,6 +511,8 @@ def evaluate_rosenbrock(xo, alpha, epsilon, kmax):
   Q = np.array([[8,4],[4,4]])
   df_dx = "8*x+4*w-3"  #x1
   df_dw = "4*w+4*x"    #x2
+  df_dx = "-400*x*(w-x**2)-2*(1-x)"  #x1
+  df_dw = "200*(w-x**2)"    #x2
   xo = np.matrix(xo, dtype=float)
   xk = np.transpose(xo)
   x = xk[0, 0]
