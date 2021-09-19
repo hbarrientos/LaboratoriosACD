@@ -8,12 +8,13 @@ dashboardPage(
     dashboardSidebar(
         sidebarMenu(
             menuItem("Ceros", tabName = "Ceros"),
-            menuItem("Derivacion f(X)", tabName = "DerivacionX"),
-            menuItem("Derivacion f(X,Y)", tabName = "DerivacionXY"),
+            menuItem("Derivaci\u00F3n f(X)", tabName = "DerivacionX"),
+            menuItem("Derivaci\u00F3n f(X,Y)", tabName = "DerivacionXY"),
             menuItem("Bisecci\u00F3n f(X)", tabName = "bisection"),
             menuItem("Newton Raphson f(X)", tabName = "newtonraphson"),
             menuItem("Gradient Descent (QP)", tabName = "gradient"),
-            menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function")
+            #menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function"),
+            menuItem("Funci\u00F3n de Rosenbrock", tabName = "rosenbrock")
         )
     ),
     dashboardBody(
@@ -115,7 +116,26 @@ dashboardPage(
                            dataTableOutput("tbl_gd")
                     ),tabPanel(title="plot",
                                plotOutput("plot_gd")
-                    ))))
-        )
+                    ))))),
+            tabItem("rosenbrock", h1("Función Rosenbrock"),
+                    fluidRow(
+                        box(width = "100%",
+                            tabsetPanel(id="paneles_r",
+                                        tabPanel("parámetros",
+                                                 textInput("tinput_x_r",  "x", "[-1.2, 1]"),
+                                                 textInput("tinput_error_r",  "error", "0.05"),
+                                                 textInput("tinput_kmax_r",  "Iteraciones", "1000"),
+                                                 selectInput("tinput_alpha_r", label = "Step size",
+                                                             choices = list("Step Constante (0.5)" = 0.5,
+                                                                            "Backtracking" = 1)),
+                                                 actionButton("btn_r",   "Ejecutar m\u00E9todo", icon = icon("table")),
+                                                 helpText("Nota: Los vectores x deben estar escritos en sintaxis python")
+                                        ),
+                                        tabPanel(title="resultados_r",
+                                                 dataTableOutput("tbl_r")
+                                        ),tabPanel(title="plot_r",
+                                                   plotOutput("plot_r")
+                                        ))))
+            )
     )
 ))
