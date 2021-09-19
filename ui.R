@@ -14,7 +14,8 @@ dashboardPage(
             menuItem("Newton Raphson f(X)", tabName = "newtonraphson"),
             menuItem("Gradient Descent (QP)", tabName = "gradient"),
             #menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function"),
-            menuItem("Funci\u00F3n de Rosenbrock", tabName = "rosenbrock")
+            menuItem("Funci\u00F3n de Rosenbrock", tabName = "rosenbrock"),
+            menuItem("Newton con Backtracking", tabName = "newton")
         )
     ),
     dashboardBody(
@@ -135,7 +136,26 @@ dashboardPage(
                                                  dataTableOutput("tbl_r")
                                         ),tabPanel(title="plot_r",
                                                    plotOutput("plot_r")
-                                        ))))
-            )
+                                        ))))),
+            tabItem("newton", h1("Newton con Backtring"),
+                    fluidRow(
+                        box(width = "100%",
+                            tabsetPanel(id="paneles_n",
+                                        tabPanel("parámetros",
+                                                 textInput("tinput_x_n",  "x", "[0, 0]"),
+                                                 textInput("tinput_error_n",  "error", "10**-8"),
+                                                 textInput("tinput_kmax_n",  "Iteraciones", "3000"),
+                                                 selectInput("tinput_alpha_n", label = "Step size",
+                                                             choices = list("Step-size unitario" = 1,
+                                                                            "Backtracking" = 0)),
+                                                 actionButton("btn_n",   "Ejecutar m\u00E9todo", icon = icon("table")),
+                                                 helpText("Nota: Los vectores x deben estar escritos en sintaxis python\n
+                                                           alpha = 1 \n ro = 1/2 \n c = 10**-4")
+                                        ),
+                                        tabPanel(title="resultados_n",
+                                                 dataTableOutput("tbl_n")
+                                        ),tabPanel(title="plot_n",
+                                                   plotOutput("plot_n")
+                                        )))))
     )
 ))
