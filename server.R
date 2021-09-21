@@ -2,6 +2,7 @@ library(shiny)
 library(reticulate)
 library(ggplot2)
 library(dplyr)
+library(reshape2)
 
 source_python("algoritmos.py")
 source_python("gd.py")
@@ -149,7 +150,7 @@ shinyServer(function(input, output, session) {
 
 
     
-    # 3rd laboratory, Rosenbrock's frunction
+    # 3rd laboratory, Rosenbrock's function
     rosenbrock_method <- eventReactive(input$btn_rbck, {
         xo <- input$tinput_rbckxo
         alpha <- input$tinput_rbck_alpha
@@ -162,5 +163,52 @@ shinyServer(function(input, output, session) {
         rosenbrock_method(),
         digits = 8, striped = TRUE, bordered = TRUE, hover = TRUE
     )
+
+
+
+    # 4th laboratory, GD variants
+    rvalues <- reactiveValues(message = '', miplot=cars)
+    observeEvent(input$btn_gendata, {
+        result = create_persist_data(input$gdv_rows, input$gdv_columns, input$gdv_path)
+        rvalues$message <- "Los archivos se crearon con exito"
+    })
+    observe(output$txtout_message <- renderText(HTML(rvalues$message))) #isolate(values$a)
+
+    observeEvent(input$btn_gdvariants, {
+        result <- evaluate_gdvariant(input$rdb_gdvariant,
+                                     input$gdv_epsilon,
+                                     input$gdv_kmax,
+                                     input$gdv_alpha,
+                                     input$gdv_epochs,
+                                     input$gdv_batches,
+                                     input$gdv_path)
+        rvalues$result_data <- result
+        rvalues$fx <- result[[2]][[1]]
+        rvalues$miplot <- result
+    })
+    observe(output$gdv_fx <- renderText(
+        if (input$rdb_gdvariant == "1") {
+            HTML("Valor de la funcion objetivo f(x) = ", rvalues$fx)
+        } else {
+            HTML("")
+        }
+    ))
+    output$gdv_dttable <- renderDataTable(
+        rvalues$result_data, 
+        options = list(pageLength=10, autoWidth= TRUE, searching=FALSE)
+    )
+    output$gdv_plot <- renderPlot({
+        if (input$rdb_gdvariant != "1") {
+            df25 <- rvalues$miplot %>% filter(i_th <= 25)
+            mdf <- melt(df25, id="i_th")
+            ggplot(mdf, aes(x=i_th, y=value, colour=variable, group=variable)) + 
+                geom_line()+
+                theme_bw()+
+                ggtitle("GD Variant")
+        }
+    })
+    
+
+    
 
 })

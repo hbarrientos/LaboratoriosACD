@@ -13,7 +13,8 @@ dashboardPage(
             menuItem("Bisecci\u00F3n f(X)", tabName = "bisection"),
             menuItem("Newton Raphson f(X)", tabName = "newtonraphson"),
             menuItem("Gradient Descent (QP)", tabName = "gradient"),
-            menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function")
+            menuItem("Funci\u00F3n de Rosenbrock f(x,y)", tabName = "rosenbrock_function"),
+            menuItem("GD variants", tabName = "gd_variants")
         )
     ),
     dashboardBody(
@@ -116,6 +117,70 @@ dashboardPage(
                     ),tabPanel(title="plot",
                                plotOutput("plot_gd")
                     ))))
+            ),
+            
+            tabItem(
+                "gd_variants",
+                h1("Variantes Descenso de gradiente"),
+                fluidRow(
+                    tabsetPanel(
+                        id = "gdv_paneles",
+                        tabPanel(
+                            title = "Variantes",
+                            column(
+                                 width = 6,
+                                 box(status = "primary", 
+                                     title = "Generaci\u00F3n de datos",
+                                     solidHeader = TRUE, collapsible = TRUE,
+                                     numericInput("gdv_rows", "Observaciones (filas):", "1000"),
+                                     numericInput("gdv_columns", "Variables (columnas):", "100"),
+                                     textInput("gdv_path", "Directorio:",
+                                         "C:\\Users\\hbarrientosg\\Documents\\Galileo\\2021T03\\Algoritmos Ciencia Datos\\Laboratorios\\LaboratoriosACD\\"),
+                                     helpText("Nota: los archivos (uno por cada matriz) se crean en la misma ubicaci\u00F3n donde se encuentran el archivo 'algoritmos.py'."),
+                                     actionButton("btn_gendata", "Generar datos", icon = icon("database")),
+                                     textOutput("txtout_message"),
+                                     width = 12
+                                 )
+                            ),
+                            column(width = 6,
+                                box(radioButtons(
+                                        "rdb_gdvariant",
+                                        label = "Variante",
+                                        choices = list(
+                                            "Soluci\u00F3n cerrada" = 1,
+                                            "(GD) Descenso de gradiente" = 2,
+                                            "(SGD) Descenso de gradiente estocastico" = 3,
+                                            "(MBGD) Descenso de gradiente minibatch" = 4
+                                        )
+                                    ),
+                                    fluidRow(
+                                        column(width = 6, textInput("gdv_epsilon", "Tolerancia (\u03B5):", "0.00001")),
+                                        column(width = 6, numericInput("gdv_kmax", "Iteraciones maximas:", "1000")),
+                                    ),
+                                    fluidRow(
+                                        column(width = 6, textInput("gdv_alpha", "Learning rate (\u03B1k):", "[0.00005, 0.0005, 0.0007]")),
+                                        column(width = 6, numericInput("gdv_epochs", "Epochs:", "1000")),
+                                    ),
+                                    textInput("gdv_batches", "Tamanio de batch:", "[25, 50, 100]"),
+                                    actionButton("btn_gdvariants", "Ejecutar m\u00E9todo", icon = icon("table")),
+                                    helpText("Tip:"),
+                                    width = 12
+                                )                            
+                            ) #column
+                         ), #tabpanel
+                         tabPanel(title = "Tabla de datos",
+                              column(width = 1),
+                              column(width = 10,
+                                  textOutput("gdv_fx"),
+                                  fluidRow(dataTableOutput("gdv_dttable"))
+                              )
+                          ),
+                         tabPanel(title = "Grafico de datos",
+                                  plotOutput("gdv_plot"))
+                    ) #tabsetpanel
+                )
+            ) #tabitem
+            
         )
     )
-))
+)

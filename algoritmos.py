@@ -4,10 +4,13 @@ import re
 from sympy import diff, solveset, Eq, Interval, S
 from sympy.abc import x,y
 from math import *
+import os.path
+# import os 
 
 
 p = re.compile('[\+|\-|*|/]')
 math_operator = ["+", "-", "*", "/"]
+lab4_prefix_filename = "datalab4"
 
 def process_exp(func_str):
   e_index = func_str.find("e^")
@@ -542,3 +545,159 @@ def evaluate_rosenbrock(xo, alpha, epsilon, kmax):
   return pd.DataFrame.from_dict(dict_result)
 
 
+
+def evaluate_gdvariant(variant, epsilon, kmax, learning_rates, epochs, batch_sizes, path):
+  variant = int(variant)
+  epsilon = float(epsilon)
+  learning_rates = eval(learning_rates)
+  batch_sizes = eval(batch_sizes)
+  # path = os.path.dirname(os.path.realpath(__file__))
+  # path = path.replace("\\", "\\\\") + "\\\\"
+  if (not os.path.exists(path + lab4_prefix_filename+'_A.csv')):
+    create_persist_data(parent_path = path)
+  A = np.genfromtxt(path + lab4_prefix_filename + '_A.csv', delimiter=',', dtype=None)
+  b = np.genfromtxt(path + lab4_prefix_filename + '_b.csv', delimiter=',', dtype=None)
+  b = b.reshape((b.shape[0], 1))
+  x_true = np.genfromtxt(path + lab4_prefix_filename + '_x_true.csv', delimiter=',', dtype=None)
+  x_true = x_true.reshape((x_true.shape[0], 1))
+  n = A.shape[0]
+  d = A.shape[1]
+  dict_result= {}
+  fx = 0
+
+  if (variant == 1):
+    AT = A.transpose()
+    ATdotA = AT.dot(A)
+    ATdotA_inv = np.linalg.inv(ATdotA)
+    ATdotB = AT.dot(b)
+    x_asterisk = ATdotA_inv.dot(ATdotB)
+    # print("SHAPES::: A:", A.shape, "; b:", b.shape, "; AT:", AT.shape, "; ATdotA:", ATdotA.shape, "; x_asterisk:", x_asterisk.shape)
+    fx = compute_LSS(A, b, x_asterisk)
+    dict_result = {'x*': x_asterisk.reshape((1, x_asterisk.shape[0]))[0].tolist(), 
+                  "f(x)": [fx for i in range(x_asterisk.shape[0])]
+                  }
+
+  elif (variant == 2):  #GD
+    dict_result["i_th"] = []
+    k_lr = {}
+    k = 0
+    while k < kmax:
+      dict_result["i_th"].append(k)
+      for alpha in learning_rates:
+        if ("fi_"+str(alpha) not in dict_result):
+          dict_result["fi_"+str(alpha)] = []
+        if (alpha in k_lr):
+          xk = k_lr[alpha]
+        else:
+          xk = np.zeros((d, 1))
+        # for epoch in range(epochs):
+        gradient = get_gradient_by_sum(A, b, xk)
+        xk1 = xk - alpha * gradient
+        xk = xk1
+        k_lr[alpha] = xk
+        fx = compute_LSS(A, b, xk)
+        dict_result["fi_"+str(alpha)].append(float(fx))
+      k += 1
+
+  elif (variant == 3):  #SGD
+    dict_result["i_th"] = []
+    k_lr = {}
+    k = 0
+    while k < kmax:
+      dict_result["i_th"].append(k)
+      for alpha in learning_rates:
+        if ("fi_"+str(alpha) not in dict_result):
+          dict_result["fi_"+str(alpha)] = []
+        if (alpha in k_lr):
+          xk = k_lr[alpha]
+        else:
+          xk = np.zeros((d, 1))
+        for epoch in range(epochs):
+          rndi = np.random.randint(0, n, size=(1))[0] #indice aleatorio de la observacion
+          gradient = get_gradient_by_sum(A[rndi, :].reshape((1, d)), 
+                                        b[rndi, :].reshape((1, 1)), 
+                                        xk)
+          xk1 = xk - alpha * gradient
+          xk = xk1
+        k_lr[alpha] = xk
+        fx = compute_LSS(A, b, xk)
+        dict_result["fi_"+str(alpha)].append(float(fx))
+      k += 1
+
+  elif (variant == 4):  #MBGD
+    dict_result = {"i_th": [epoch+1 for epoch in range(epochs)]}
+    for alpha in learning_rates:
+      xk = np.zeros((d, 1)) #valores iniciales, random
+      for bsize in batch_sizes:
+        if (A.shape[0] >= bsize):
+          fi_ai = []
+          for epoch in range(epochs):
+            fx = compute_LSS(A, b, xk)
+            fi_ai.append(float(fx))
+            gradient = get_gradient_by_sum(A[:bsize, :], 
+                                          b[:bsize, :].reshape((bsize, 1)), 
+                                          xk)
+            xk1 = xk - alpha * gradient
+            xk = xk1
+          dict_result["fi_"+str(bsize)+"_"+str(alpha)] = fi_ai
+
+  print("\tPROCESO TERMINADO")
+  return pd.DataFrame.from_dict(dict_result)
+
+
+
+def compute_LSS(A, b, x_asterisk):
+  fx = sum([(x_asterisk.transpose().dot(A[i]) - b[i])**2 \
+            for i in range(A.shape[0])])
+  return fx
+
+
+
+"""
+  Ejecuta la funcion de costo Least Square Sum (LSS)
+  Parametros
+    A:
+    b:
+    Xk:
+"""
+def get_gradient_by_sum(A, b, Xk):
+  n = A.shape[0]
+  d = A.shape[1]
+  gradient = np.zeros_like(Xk)
+  for i in range(n):
+    ai  = A[i, :].reshape((1, d))
+    aiT = A[i, :].transpose()
+    gradient = gradient + (aiT.dot(Xk) - b[i, :]).dot(ai)
+  # (1/n) * SUM((aiT*xk -bi)*ai)
+  gradient = gradient.sum(axis = 1).reshape((d, 1))
+  gradient = (1/n) * gradient
+  return gradient
+
+
+"""
+  d: cantidad de columnas para el dataset.
+  n: cantidad de observaciones para el dataset.
+  parent_path: ubicacion de los archivos de datos
+"""
+def create_persist_data(n = 1000, d = 100, parent_path = ""):
+  A = np.random.normal(0, 1, size=(n, d))
+  x_true = np.random.normal(0, 1, size=(d, 1))
+  b = A.dot(x_true) + np.random.normal(0, 0.5, size=(n, 1))
+  path_filename = parent_path + lab4_prefix_filename
+  np.savetxt(path_filename + '_A.csv', A, delimiter = ',')
+  np.savetxt(path_filename + '_x_true.csv', x_true, delimiter = ',')
+  np.savetxt(path_filename + '_b.csv', b, delimiter = ',')
+  
+
+# def main():
+#   variant = 3
+#   epsilon = 0.00001
+#   kmax = 1000
+#   learning_rates = "[0.0005, 0.005, 0.01]"
+#   epochs = 1000
+#   batch_sizes = "[25,50,200]"
+#   path = "C:\\Users\\hbarrientosg\\Documents\\Galileo\\2021T03\\Algoritmos Ciencia Datos\\Laboratorios\\LaboratoriosACD\\"
+#   result = evaluate_gdvariant(variant, epsilon, kmax, learning_rates, epochs, batch_sizes, path)
+# 
+# if __name__ == "__main__":
+#     main()
