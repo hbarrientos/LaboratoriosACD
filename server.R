@@ -6,6 +6,8 @@ library(reshape2)
 
 source_python("algoritmos.py")
 source_python("gd.py")
+source_python("rosenbrock.py")
+source_python("newton.py")
 
 #tableOut, soluc = newtonSolverX(-5, "2x^5 - 3", 0.0001)
 
@@ -163,7 +165,47 @@ shinyServer(function(input, output, session) {
         rosenbrock_method(),
         digits = 8, striped = TRUE, bordered = TRUE, hover = TRUE
     )
-
+    
+    #Rosenbrock's Function Lab 4
+    r_method <- eventReactive(input$btn_r, {
+        x <- input$tinput_x_r
+        error <- input$tinput_error_r
+        kmax <- input$tinput_kmax_r
+        step <- input$tinput_alpha_r
+        r <- Rosenbrock(x, error, kmax, step)
+        r$algorithm()
+        r$iterations()
+    })
+    
+    r_method_plot <- eventReactive(input$btn_r, {
+        x <- input$tinput_x_r
+        error <- input$tinput_error_r
+        kmax <- input$tinput_kmax_r
+        step <- input$tinput_alpha_r
+        r <- Rosenbrock(x, error, kmax, step)
+        r$algorithm()
+        r$results %>%
+            ggplot(aes(x=k, y=grad_fx_k)) +
+            geom_line(color="grey") +
+            geom_point(shape=21, color="black", fill="#69b3a2", size=3) +
+            theme_bw()+
+            ggtitle("Rosenbrock's Function´")
+        
+    })
+    
+    observeEvent(input$btn_r,{
+        updateTabsetPanel(session, "paneles_r",
+                          selected = "resultados_r"                    )
+    })
+    
+    output$tbl_r <- renderDataTable(
+        r_method(),
+        options = list(pageLength=10, autoWidth= TRUE, searching=FALSE)
+    )
+    
+    output$plot_r<- renderPlot({
+        r_method_plot()
+    })
 
 
     # 4th laboratory, GD variants
@@ -209,6 +251,47 @@ shinyServer(function(input, output, session) {
     })
     
 
+    #Newton Backtracking Lba 4
+    n_method <- eventReactive(input$btn_n, {
+        x <- input$tinput_x_n
+        error <- input$tinput_error_n
+        kmax <- input$tinput_kmax_n
+        step <- input$tinput_alpha_n
+        n <- Newton(x, error, kmax, step)
+        n$algorithm()
+        n$iterations()
+    })
     
+    n_method_plot <- eventReactive(input$btn_n, {
+        x <- input$tinput_x_n
+        error <- input$tinput_error_n
+        kmax <- input$tinput_kmax_n
+        step <- input$tinput_alpha_n
+        n <- Newton(x, error, kmax, step)
+        n$algorithm()
+        n$results %>%
+            ggplot(aes(x=k, y=grad_fx_k)) +
+            geom_line(color="grey") +
+            geom_point(shape=21, color="black", fill="#69b3a2", size=3) +
+            theme_bw()+
+            ggtitle("Newton Backtracking")
+        
+    })
+    
+    observeEvent(input$btn_n,{
+        updateTabsetPanel(session, "paneles_n",
+                          selected = "resultados_n"                    )
+    })
+    
+    output$tbl_n <- renderDataTable(
+        n_method(),
+        options = list(pageLength=10, autoWidth= TRUE, searching=FALSE)
+    )
+    
+    output$plot_n<- renderPlot({
+        n_method_plot()
+    })
 
+
+    
 })

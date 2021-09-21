@@ -625,21 +625,47 @@ def evaluate_gdvariant(variant, epsilon, kmax, learning_rates, epochs, batch_siz
       k += 1
 
   elif (variant == 4):  #MBGD
-    dict_result = {"i_th": [epoch+1 for epoch in range(epochs)]}
-    for alpha in learning_rates:
-      xk = np.zeros((d, 1)) #valores iniciales, random
+    dict_result["i_th"] = []
+    k_lr = {}
+    k = 0
+    while k < kmax:
+      dict_result["i_th"].append(k)
       for bsize in batch_sizes:
-        if (A.shape[0] >= bsize):
-          fi_ai = []
-          for epoch in range(epochs):
-            fx = compute_LSS(A, b, xk)
-            fi_ai.append(float(fx))
-            gradient = get_gradient_by_sum(A[:bsize, :], 
-                                          b[:bsize, :].reshape((bsize, 1)), 
+        if (A.shape[0] >= bsize):      
+          for alpha in learning_rates:
+            colname = "fi_"+str(bsize)+"_"+str(alpha)
+            if (colname not in dict_result):
+              dict_result[colname] = []
+            if ((bsize+alpha) in k_lr):
+              xk = k_lr[bsize+alpha]
+            else:
+              xk = np.zeros((d, 1))
+            for epoch in range(epochs):
+              gradient = get_gradient_by_sum(A[:bsize, :], 
+                                          b[:bsize, :].reshape((bsize, 1)),
                                           xk)
-            xk1 = xk - alpha * gradient
-            xk = xk1
-          dict_result["fi_"+str(bsize)+"_"+str(alpha)] = fi_ai
+              xk1 = xk - alpha * gradient
+              xk = xk1
+            k_lr[alpha] = xk
+            fx = compute_LSS(A, b, xk)
+            dict_result[colname].append(float(fx))
+          k += 1
+
+    # dict_result = {"i_th": [epoch+1 for epoch in range(epochs)]}
+    # for alpha in learning_rates:
+    #   xk = np.zeros((d, 1)) #valores iniciales, random
+    #   for bsize in batch_sizes:
+    #     if (A.shape[0] >= bsize):
+    #       fi_ai = []
+    #       for epoch in range(epochs):
+    #         fx = compute_LSS(A, b, xk)
+    #         fi_ai.append(float(fx))
+    #         gradient = get_gradient_by_sum(A[:bsize, :], 
+    #                                       b[:bsize, :].reshape((bsize, 1)), 
+    #                                       xk)
+    #         xk1 = xk - alpha * gradient
+    #         xk = xk1
+    #       dict_result["fi_"+str(bsize)+"_"+str(alpha)] = fi_ai
 
   print("\tPROCESO TERMINADO")
   return pd.DataFrame.from_dict(dict_result)
